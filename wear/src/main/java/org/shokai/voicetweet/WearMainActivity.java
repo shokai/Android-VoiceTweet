@@ -17,11 +17,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 public class WearMainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -90,27 +87,9 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
             List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             String tweet = results.get(0);
             mTextView.setText(tweet);
-
-            new AsyncTask<String, Void, String>() {
-                @Override
-                protected String doInBackground(String... params) {
-                    String tweet = params[0];
-                    sendTweet(tweet);
-                    return null;
-                }
-            }.execute(tweet);
+            sendTweetAsync(tweet);
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private Collection<String> getNodes() {
-        HashSet<String> results = new HashSet<String>();
-        NodeApi.GetConnectedNodesResult nodes =
-                Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
-        for (Node node : nodes.getNodes()) {
-            results.add(node.getId());
-        }
-        return results;
     }
 
     @Override
@@ -118,26 +97,34 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
         Log.i(TAG, "GoogleApiClient Connected");
     }
 
-    public void sendTweet(String tweet){
-        Log.i(TAG, "send "+tweet+" to handheld!!");
-        byte[] bytes;
-        try {
-            bytes = tweet.getBytes("UTF-8");
-        }
-        catch(Exception ex){
-            Log.e(TAG, ex.getMessage());
-            return;
-        }
-        for (String nodeId : getNodes()) {
-            Log.i(TAG, "sending to node:"+nodeId);
-            Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, MESSAGE_PATH_TWEET, bytes)
-                    .setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
-                        @Override
-                        public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-                            Log.i(TAG, sendMessageResult.toString());
-                        }
-                    });
-        }
+    public void sendTweetAsync(String tweet){
+        if(tweet == null) return;
+        Log.i(TAG, "send \""+tweet+"\" to handheld");
+        new AsyncTask<String, Void, String>() {
+            @Override
+            protected String doInBackground(String... params) {
+                String tweet = params[0];
+                byte[] bytes;
+                try {
+                    bytes = tweet.getBytes("UTF-8");
+                }
+                catch(Exception ex){
+                    Log.e(TAG, ex.getMessage());
+                    return null;
+                }
+                for (Node node : Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await().getNodes()){
+                    Log.v(TAG, "sending to node:" + node.getId());
+                    Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), MESSAGE_PATH_TWEET, bytes)
+                            .setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+                                @Override
+                                public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+                                    Log.v(TAG, sendMessageResult.toString());
+                                }
+                            });
+                }
+                return null;
+            }
+        }.execute(tweet);
     }
 
     @Override
