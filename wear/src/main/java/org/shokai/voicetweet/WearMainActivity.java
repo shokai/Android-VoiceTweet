@@ -90,7 +90,7 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
             List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             String tweet = results.get(0);
             mTextView.setText(tweet);
-            
+
             new AsyncTask<String, Void, String>() {
                 @Override
                 protected String doInBackground(String... params) {
