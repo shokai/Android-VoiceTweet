@@ -7,10 +7,19 @@ import android.util.Log;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+
 public class TweetService extends WearableListenerService {
 
     private final String TAG = "TweetService";
     public final String MESSAGE_PATH_TWEET = "/tweet/post";
+    private TwitterUtil mTwitterUtil;
+
+    public TweetService(){
+        mTwitterUtil = new TwitterUtil(this);
+    }
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
@@ -25,7 +34,13 @@ public class TweetService extends WearableListenerService {
                 return;
             }
             Log.i(TAG, "receive: "+ msg);
-            sendNotification(msg);
+            Status status = updateTweet(msg);
+            if(status != null && status.getId() > 0){
+                sendNotification("tweet success ("+msg+")");
+            }
+            else {
+                sendNotification("tweet failed ("+msg+")");
+            }
         }
     }
 
@@ -41,5 +56,16 @@ public class TweetService extends WearableListenerService {
         NotificationManagerCompat manager = NotificationManagerCompat.from(this);
         manager.notify(0, notif);
 
+    }
+
+    private Status updateTweet(String tweet){
+        if(!mTwitterUtil.hasToken()) return null;
+        Twitter client = mTwitterUtil.getTwitterInstance();
+        try {
+            return client.updateStatus(tweet);
+        } catch (TwitterException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
