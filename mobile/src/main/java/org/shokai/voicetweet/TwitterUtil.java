@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
+import twitter4j.auth.AccessToken;
+import twitter4j.auth.OAuth2Token;
+import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterUtil {
 
@@ -13,6 +16,16 @@ public class TwitterUtil {
 
     public TwitterUtil(Context context){
         mContext = context;
+    }
+
+    public Twitter getTwitterInstance(){
+        ConfigurationBuilder confBuilder = new ConfigurationBuilder()
+                .setOAuthConsumerKey(mContext.getResources().getString(R.string.twitter_consumer_key))
+                .setOAuthConsumerSecret(mContext.getResources().getString(R.string.twitter_consumer_secret));
+        if(hasToken()) {
+            confBuilder.setOAuthAccessToken(getAccessToken()).setOAuthAccessTokenSecret(getAccessTokenSecret());
+        }
+        return new TwitterFactory(confBuilder.build()).getInstance();
     }
 
     public SharedPreferences getPreference(){
