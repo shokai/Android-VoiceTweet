@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.shokai.voicetweet" >
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,7 +20,17 @@
         </activity>
         <activity
             android:name=".TwitterOauthActivity"
-            android:label="Twitter Login">
+            android:label="Twitter Login"
+            android:launchMode="singleTask">
+            <intent-filter>
+
+        <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="twitter"
+                    android:scheme="voicetweet" />
+            </intent-filter>
         </activity>
         <service android:name=".TweetService">
             <intent-filter>

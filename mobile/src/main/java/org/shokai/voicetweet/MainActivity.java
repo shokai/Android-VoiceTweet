@@ -9,16 +9,24 @@ import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
+    private TwitterUtil mTwitterUtil;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mTwitterUtil = new TwitterUtil(this);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        if(!mTwitterUtil.hasToken()) {
+            MenuItem itemSettings = menu.findItem(R.id.action_settings);
+            itemSettings.setVisible(false);
+        }
         return true;
     }
 
