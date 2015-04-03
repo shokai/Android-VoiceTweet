@@ -5,6 +5,4 @@
     <string name="action_settings">Settings</string>
     <string name="action_login">Login</string>
     <string name="twitter_callback_url">voicetweet://twitter</string>
-    <string name="twitter_consumer_key">ZPts1KKH8iyKfLocFaYZ2ZfLa</string>
-    <string name="twitter_consumer_secret">sM5fIOp3Ai9zdqZBJC6zGPryb2GffbvlwwAsht4LicOxL8gD2h</string>
 </resources>

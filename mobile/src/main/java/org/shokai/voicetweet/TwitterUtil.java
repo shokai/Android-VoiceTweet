@@ -3,6 +3,10 @@ package org.shokai.voicetweet;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
@@ -12,20 +16,40 @@ import twitter4j.conf.ConfigurationBuilder;
 public class TwitterUtil {
 
     private Context mContext;
+    private Properties mProperties;
     private SharedPreferences mSharedPreferences;
 
     public TwitterUtil(Context context){
         mContext = context;
+        mProperties = new Properties();
+        try {
+            InputStream is = mContext.getResources().openRawResource(R.raw.twitter4j);
+            mProperties.load(is);
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Twitter getTwitterInstance(){
         ConfigurationBuilder confBuilder = new ConfigurationBuilder()
-                .setOAuthConsumerKey(mContext.getResources().getString(R.string.twitter_consumer_key))
-                .setOAuthConsumerSecret(mContext.getResources().getString(R.string.twitter_consumer_secret));
+                .setOAuthConsumerKey(getConsumerKey())
+                .setOAuthConsumerSecret(getConsumerSecret());
+
         if(hasToken()) {
-            confBuilder.setOAuthAccessToken(getAccessToken()).setOAuthAccessTokenSecret(getAccessTokenSecret());
+            confBuilder
+                    .setOAuthAccessToken(getAccessToken())
+                    .setOAuthAccessTokenSecret(getAccessTokenSecret());
         }
         return new TwitterFactory(confBuilder.build()).getInstance();
+    }
+
+    public String getConsumerKey(){
+        return mProperties.getProperty("oauth.consumerKey");
+    }
+
+    public String getConsumerSecret(){
+        return mProperties.getProperty("oauth.consumerSecret");
     }
 
     public SharedPreferences getPreference(){
