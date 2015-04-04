@@ -1,10 +1,18 @@
 package org.shokai.voicetweet;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.wearable.view.DelayedConfirmationView;
 import android.support.wearable.view.WatchViewStub;
+import android.view.View;
+import android.widget.TextView;
 
-public class WearTweetConfirmActivity extends Activity {
+public class WearTweetConfirmActivity extends Activity implements DelayedConfirmationView.DelayedConfirmationListener {
+
+    private DelayedConfirmationView mDelayedView;
+    private TextView mTextView;
+    private String mTweet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,8 +22,33 @@ public class WearTweetConfirmActivity extends Activity {
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub watchViewStub) {
-
+                mTextView = (TextView) stub.findViewById(R.id.text);
+                if(mTweet != null) {
+                    mTextView.setText(mTweet);
+                }
+                mDelayedView = (DelayedConfirmationView) stub.findViewById(R.id.delayed_confirm);
+                mDelayedView.setListener(WearTweetConfirmActivity.this);
+                mDelayedView.setTotalTimeMs(6000);
+                mDelayedView.start();
             }
         });
+
+        Intent intent = getIntent();
+        if(intent != null){
+            mTweet = intent.getExtras().getString("tweet");
+        }
+
+    }
+
+    @Override
+    public void onTimerFinished(View view) {
+        setResult(RESULT_OK);
+        finish();
+    }
+
+    @Override
+    public void onTimerSelected(View view) {
+        setResult(RESULT_CANCELED);
+        finish();
     }
 }

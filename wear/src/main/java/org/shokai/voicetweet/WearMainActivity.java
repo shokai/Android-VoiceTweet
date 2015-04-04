@@ -23,12 +23,14 @@ import java.util.List;
 
 public class WearMainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    private String mTweet;
     private TextView mTextView;
     private TextView mButton;
     private GoogleApiClient mGoogleApiClient;
 
     public final String TAG = "WearMainActivity";
     private final int CODE_RECOGNIZE_SPEECH = 567;
+    private final int CODE_CONFIRM_TWEET = 3;
     public final String MESSAGE_PATH_TWEET = "/tweet/post";
 
     @Override
@@ -85,9 +87,15 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
         if(requestCode == CODE_RECOGNIZE_SPEECH &&
            resultCode == RESULT_OK){
             List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            String tweet = results.get(0);
-            mTextView.setText(tweet);
-            sendTweetAsync(tweet);
+            mTweet = results.get(0);
+            Intent confirmIntent = new Intent(this, WearTweetConfirmActivity.class);
+            confirmIntent.putExtra("tweet", mTweet);
+            startActivityForResult(confirmIntent, CODE_CONFIRM_TWEET);
+        }
+        if(requestCode == CODE_CONFIRM_TWEET
+                && resultCode == RESULT_OK){
+            mTextView.setText(mTweet);
+            sendTweetAsync(mTweet);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
