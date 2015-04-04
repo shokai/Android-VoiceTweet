@@ -99,7 +99,7 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
 
     public void sendTweetAsync(String tweet){
         if(tweet == null) return;
-        Log.i(TAG, "send \""+tweet+"\" to handheld");
+        Log.i(TAG, "send \"" + tweet + "\" to handheld");
         new AsyncTask<String, Void, String>() {
             @Override
             protected String doInBackground(String... params) {
