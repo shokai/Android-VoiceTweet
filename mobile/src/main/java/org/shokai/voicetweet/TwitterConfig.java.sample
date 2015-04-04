@@ -1,0 +1,7 @@
+package org.shokai.voicetweet;
+
+public class TwitterConfig {
+    public final static String CONSUMER_KEY = "your_consumer_key";
+    public final static String CONSUMER_SECRET = "your_consumer_secret";
+    public final static boolean DEBUG = true;
+}
