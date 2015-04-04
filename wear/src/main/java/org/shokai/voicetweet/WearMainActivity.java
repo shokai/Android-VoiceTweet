@@ -9,6 +9,7 @@ import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,8 +25,7 @@ import java.util.List;
 public class WearMainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private String mTweet;
-    private TextView mTextView;
-    private TextView mButton;
+    private ImageButton mButton;
     private GoogleApiClient mGoogleApiClient;
 
     public final String TAG = "WearMainActivity";
@@ -41,8 +41,7 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
-                mTextView = (TextView) stub.findViewById(R.id.text);
-                mButton = (Button) stub.findViewById(R.id.button);
+                mButton = (ImageButton) stub.findViewById(R.id.button);
                 mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -94,7 +93,6 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
         }
         if(requestCode == CODE_CONFIRM_TWEET
                 && resultCode == RESULT_OK){
-            mTextView.setText(mTweet);
             sendTweetAsync(mTweet);
         }
         super.onActivityResult(requestCode, resultCode, data);

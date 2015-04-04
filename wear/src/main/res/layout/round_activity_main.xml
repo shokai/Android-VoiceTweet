@@ -12,14 +12,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/hello_round" />
+        android:layout_above="@+id/button"
+        android:text="@string/hello"
+        android:textSize="20dp"
+        />
 
-    <Button
+
+    <ImageButton
+        android:id="@+id/button"
+        android:src="@drawable/ic_settings_voice_white_48dp"
+        android:background="@drawable/round_box"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="15dp"
         android:text="@string/button_text"
-        android:id="@+id/button"
-        android:layout_below="@+id/text"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        />
+
 </RelativeLayout>
