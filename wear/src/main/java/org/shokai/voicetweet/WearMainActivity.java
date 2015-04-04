@@ -44,7 +44,7 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
                 mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        recognizeSpeech();
+                        startSpeechRecognition();
                     }
                 });
             }
@@ -74,7 +74,7 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
         super.onStop();
     }
 
-    private void recognizeSpeech(){
+    private void startSpeechRecognition(){
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         startActivityForResult(intent, CODE_RECOGNIZE_SPEECH);
