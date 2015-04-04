@@ -37,19 +37,15 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
+
+        mButton = (ImageButton) findViewById(R.id.button);
+        mButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                mButton = (ImageButton) stub.findViewById(R.id.button);
-                mButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startSpeechRecognition();
-                    }
-                });
+            public void onClick(View v) {
+                startSpeechRecognition();
             }
         });
+
     }
 
     @Override
