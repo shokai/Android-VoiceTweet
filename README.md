@@ -16,7 +16,7 @@ Voice-input then Tweet.
 
 - [Register your app on Twitter](http://apps.twitter.com/)
   - and get OAuth Consumer Key and Secret.
-- in `mobile/src/main/java/org/shokai/voicetweet/`
+- in `lib/src/main/java/org/shokai/voicetweet/lib/`
   - copy `TwitterConfig.java.sample` to `TwitterConfig.java`
   - set OAuth Consumer Key and Secret.
 

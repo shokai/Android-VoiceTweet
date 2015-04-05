@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
     protected void onStart() {
         super.onStart();
         if(mTwitterUtil.hasToken()){
-            mTwitter = mTwitterUtil.getTwitterInstance();
+            mTwitter = mTwitterUtil.getTwitterInstanceFromLocal();
             mButton.setVisibility(View.VISIBLE);
             mEditText.setVisibility(View.VISIBLE);
         }

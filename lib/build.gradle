@@ -19,6 +19,7 @@ android {
 }
 
 dependencies {
+    compile 'com.google.android.gms:play-services-wearable:6.5.87'
     compile 'org.twitter4j:twitter4j-core:4.0.3'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

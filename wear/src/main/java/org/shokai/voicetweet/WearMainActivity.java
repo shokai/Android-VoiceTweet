@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.support.wearable.activity.ConfirmationActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -13,23 +12,27 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
+
+import org.shokai.voicetweet.lib.TwitterUtil;
 
 import java.util.List;
 
-public class WearMainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<MessageApi.SendMessageResult> {
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+
+public class WearMainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private String mTweet;
     private ImageButton mButton;
     private GoogleApiClient mGoogleApiClient;
+    private TwitterUtil mTwitterUtil;
+    private Twitter mTwitter;
 
     public final String TAG = "WearMainActivity";
-    private final int CODE_RECOGNIZE_SPEECH = 567;
+    private final int CODE_RECOGNIZE_SPEECH = 2;
     private final int CODE_CONFIRM_TWEET = 3;
-    public final String MESSAGE_PATH_TWEET = "/tweet/post";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +47,9 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
             }
         });
 
-        startSpeechRecognition();
+        mTwitterUtil = new TwitterUtil(this);
+
+        //startSpeechRecognition();
     }
 
     @Override
@@ -63,11 +68,11 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
     }
 
     @Override
-    protected void onStop() {
+    protected void onPause() {
         if (mGoogleApiClient != null) {
             mGoogleApiClient.disconnect();
         }
-        super.onStop();
+        super.onPause();
     }
 
     private void startSpeechRecognition(){
@@ -96,29 +101,45 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(TAG, "GoogleApiClient Connected");
+        if(mTwitter != null) return;
+        mTwitterUtil.getTwitterInstance(mGoogleApiClient, new TwitterUtil.TwitterInstanceListener() {
+            @Override
+            public void onCreate(Twitter twitter) {
+                mTwitter = twitter;
+            }
+
+            @Override
+            public void onError(Exception error) {
+                Log.e(TAG, error.getMessage());
+                Toast.makeText(WearMainActivity.this, "login error", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void sendTweetAsync(String tweet){
-        if(tweet == null) return;
-        Log.i(TAG, "send \"" + tweet + "\" to handheld");
-        new AsyncTask<String, Void, String>() {
+        if(tweet == null || mTwitter == null) return;
+        Log.i(TAG, "tweet \"" + tweet + "\"");
+
+        new AsyncTask<String, Void, Status>(){
             @Override
-            protected String doInBackground(String... params) {
+            protected twitter4j.Status doInBackground(String... params) {
                 String tweet = params[0];
-                byte[] bytes;
                 try {
-                    bytes = tweet.getBytes("UTF-8");
-                }
-                catch(Exception ex){
-                    Log.e(TAG, ex.getMessage());
-                    return null;
-                }
-                for (Node node : Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await().getNodes()){
-                    Log.v(TAG, "sending to node:" + node.getId());
-                    Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), MESSAGE_PATH_TWEET, bytes)
-                            .setResultCallback(WearMainActivity.this);
+                    return mTwitter.updateStatus(tweet);
+                } catch (TwitterException e) {
+                    e.printStackTrace();
                 }
                 return null;
+            }
+
+            @Override
+            protected void onPostExecute(twitter4j.Status status) {
+                if(status != null && status.getId() > 0){
+                    Toast.makeText(WearMainActivity.this, "success!", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(WearMainActivity.this, "failed", Toast.LENGTH_SHORT).show();
+                }
             }
         }.execute(tweet);
     }
@@ -140,21 +161,4 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
         finish();
     }
 
-    /*
-     Result from Handheld
-     */
-    @Override
-    public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-        Intent intent = new Intent(WearMainActivity.this, ConfirmationActivity.class);
-        if (sendMessageResult.getStatus().isSuccess()) {
-            Log.v(TAG, "success");
-            intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, "success");
-            intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.SUCCESS_ANIMATION);
-        }
-        else{
-            intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, "failed");
-            intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.FAILURE_ANIMATION);
-        }
-        startActivity(intent);
-    }
 }

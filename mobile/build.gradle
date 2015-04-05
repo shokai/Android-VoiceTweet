@@ -21,8 +21,6 @@ android {
 
 dependencies {
     wearApp project(':wear')
-    compile 'com.google.android.gms:play-services:+'
-    compile 'org.twitter4j:twitter4j-core:4.0.3'
     compile project(':lib')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

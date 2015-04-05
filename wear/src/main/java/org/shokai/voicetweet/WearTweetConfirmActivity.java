@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 public class WearTweetConfirmActivity extends Activity implements DelayedConfirmationView.DelayedConfirmationListener {
 
-    private final String TAG = "WearTweetConfirmActivity";
+    private final String TAG = "TweetConfirmActivity";
     private DelayedConfirmationView mDelayedView;
     private TextView mTextView;
     private String mTweet;

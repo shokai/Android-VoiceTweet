@@ -10,6 +10,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Wearable;
+
 import org.shokai.voicetweet.lib.TwitterUtil;
 
 import twitter4j.Twitter;
@@ -17,10 +21,12 @@ import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
-public class TwitterOauthActivity extends Activity implements View.OnClickListener {
+public class TwitterOauthActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
     private final String TAG = "TwitterOauthActivity";
     private Button mButtonLogin;
+    private GoogleApiClient mGoogleApiClient;
+
     private TwitterUtil mTwitterUtil;
     private Twitter mTwitter;
     private String mCallbackUrl;
@@ -33,7 +39,7 @@ public class TwitterOauthActivity extends Activity implements View.OnClickListen
         setContentView(R.layout.activity_twitter_oauth);
 
         mTwitterUtil = new TwitterUtil(this);
-        mTwitter = mTwitterUtil.getTwitterInstance();
+        mTwitter = mTwitterUtil.getTwitterInstanceFromLocal();
 
         mCallbackUrl = getResources().getString(R.string.twitter_callback_url);
 
@@ -45,11 +51,56 @@ public class TwitterOauthActivity extends Activity implements View.OnClickListen
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(Wearable.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+        }
+        if (!mGoogleApiClient.isConnected()){
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(TAG, "GoogleApiClient Connected");
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        String msg = "GoogleApiClient connection suspended";
+        Log.i(TAG, msg);
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        finish();
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        String msg = "GoogleApiClient connection failed" + result.toString();
+        Log.i(TAG, msg);
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+    @Override
     public void onClick(View v) {
         if(v.getId() != R.id.button_login) return;
 
         if(mTwitterUtil.hasToken()) {
-            mTwitterUtil.logout();
+            mTwitterUtil.logout(mGoogleApiClient);
             finish();
         }
         else {
@@ -73,7 +124,6 @@ public class TwitterOauthActivity extends Activity implements View.OnClickListen
             @Override
             protected void onPostExecute(String url) {
                 if(url == null) {
-
                     Log.i(TAG, "authorization URL not found");
                     Toast.makeText(TwitterOauthActivity.this, "Auth failed", Toast.LENGTH_SHORT).show();
                     return;
@@ -112,8 +162,7 @@ public class TwitterOauthActivity extends Activity implements View.OnClickListen
 
     private void authSuccess(AccessToken token){
         Toast.makeText(this, "auth success!", Toast.LENGTH_SHORT).show();
-        mTwitterUtil.setAccessToken(token.getToken());
-        mTwitterUtil.setAccessTokenSecret(token.getTokenSecret());
+        mTwitterUtil.setAccessTokenAndSecret(mGoogleApiClient, token.getToken(), token.getTokenSecret());
         finish();
     }
 }
