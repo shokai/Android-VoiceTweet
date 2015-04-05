@@ -44,6 +44,7 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
             }
         });
 
+        startSpeechRecognition();
     }
 
     @Override
