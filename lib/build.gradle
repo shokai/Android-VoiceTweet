@@ -1,11 +1,10 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "org.shokai.voicetweet"
         minSdkVersion 21
         targetSdkVersion 21
         versionCode 1
@@ -20,9 +19,6 @@ android {
 }
 
 dependencies {
-    wearApp project(':wear')
-    compile 'com.google.android.gms:play-services:+'
     compile 'org.twitter4j:twitter4j-core:4.0.3'
-    compile project(':lib')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

@@ -7,6 +7,8 @@ import android.util.Log;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import org.shokai.voicetweet.lib.TwitterUtil;
+
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;

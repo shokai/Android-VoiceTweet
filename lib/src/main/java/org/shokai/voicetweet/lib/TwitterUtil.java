@@ -1,4 +1,4 @@
-package org.shokai.voicetweet;
+package org.shokai.voicetweet.lib;
 
 import android.content.Context;
 import android.content.SharedPreferences;
