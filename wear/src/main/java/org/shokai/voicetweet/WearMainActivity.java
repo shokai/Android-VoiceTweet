@@ -5,12 +5,10 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.support.wearable.view.WatchViewStub;
+import android.support.wearable.activity.ConfirmationActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -22,7 +20,7 @@ import com.google.android.gms.wearable.Wearable;
 
 import java.util.List;
 
-public class WearMainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class WearMainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<MessageApi.SendMessageResult> {
 
     private String mTweet;
     private ImageButton mButton;
@@ -117,12 +115,7 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
                 for (Node node : Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await().getNodes()){
                     Log.v(TAG, "sending to node:" + node.getId());
                     Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), MESSAGE_PATH_TWEET, bytes)
-                            .setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
-                                @Override
-                                public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-                                    Log.v(TAG, sendMessageResult.toString());
-                                }
-                            });
+                            .setResultCallback(WearMainActivity.this);
                 }
                 return null;
             }
@@ -144,5 +137,23 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
         Log.i(TAG, msg);
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         finish();
+    }
+
+    /*
+     Result from Handheld
+     */
+    @Override
+    public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+        Intent intent = new Intent(WearMainActivity.this, ConfirmationActivity.class);
+        if (sendMessageResult.getStatus().isSuccess()) {
+            Log.v(TAG, "success");
+            intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, "success");
+            intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.SUCCESS_ANIMATION);
+        }
+        else{
+            intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, "failed");
+            intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.FAILURE_ANIMATION);
+        }
+        startActivity(intent);
     }
 }

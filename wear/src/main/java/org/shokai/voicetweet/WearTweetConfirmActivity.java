@@ -4,12 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.wearable.view.DelayedConfirmationView;
-import android.support.wearable.view.WatchViewStub;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 public class WearTweetConfirmActivity extends Activity implements DelayedConfirmationView.DelayedConfirmationListener {
 
+    private final String TAG = "WearTweetConfirmActivity";
     private DelayedConfirmationView mDelayedView;
     private TextView mTextView;
     private String mTweet;
@@ -37,12 +38,14 @@ public class WearTweetConfirmActivity extends Activity implements DelayedConfirm
 
     @Override
     public void onTimerFinished(View view) {
+        Log.v(TAG, "finished");
         setResult(RESULT_OK);
         finish();
     }
 
     @Override
     public void onTimerSelected(View view) {
+        Log.v(TAG, "canceled");
         setResult(RESULT_CANCELED);
         finish();
     }

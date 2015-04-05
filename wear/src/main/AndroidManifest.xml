@@ -19,6 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".WearTweetConfirmActivity" />
+        <activity android:name="android.support.wearable.activity.ConfirmationActivity" />
     </application>
 
 </manifest>
