@@ -33,7 +33,7 @@ public class TweetService extends WearableListenerService {
                 Log.e(TAG, ex.getMessage());
                 return;
             }
-            Log.i(TAG, "receive: "+ msg);
+            Log.i(TAG, "receive from wear: "+ msg);
             Status status = updateTweet(msg);
             if(status != null && status.getId() > 0){
                 sendNotification("tweet success ("+msg+")");

@@ -71,7 +71,6 @@ public class TwitterOauthActivity extends Activity implements View.OnClickListen
             @Override
             protected void onPostExecute(String url) {
                 if(url == null) {
-
                     Log.i(TAG, "authorization URL not found");
                     Toast.makeText(TwitterOauthActivity.this, "Auth failed", Toast.LENGTH_SHORT).show();
                     return;
