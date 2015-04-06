@@ -2,6 +2,7 @@ package org.shokai.voicetweet;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,7 +19,7 @@ import twitter4j.auth.RequestToken;
 public class TwitterOauthActivity extends Activity implements View.OnClickListener {
 
     private final String TAG = "TwitterOauthActivity";
-    private Button mButtonLogin;
+
     private TwitterUtil mTwitterUtil;
     private Twitter mTwitter;
     private String mCallbackUrl;
@@ -33,13 +34,14 @@ public class TwitterOauthActivity extends Activity implements View.OnClickListen
         mTwitterUtil = new TwitterUtil(this);
         mTwitter = mTwitterUtil.getTwitterInstance();
 
-        mCallbackUrl = getResources().getString(R.string.twitter_callback_url);
+        Resources resources = getResources();
+        mCallbackUrl = resources.getString(R.string.auth_scheme)+"://"+resources.getString(R.string.auth_host);
 
-        mButtonLogin = (Button)findViewById(R.id.button_login);
+        Button buttonLogin = (Button)findViewById(R.id.button_login);
         if(mTwitterUtil.hasToken()) {
-            mButtonLogin.setText("Logout");
+            buttonLogin.setText("Logout");
         }
-        mButtonLogin.setOnClickListener(this);
+        buttonLogin.setOnClickListener(this);
     }
 
     @Override

@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">VoiceTweet</string>
-
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_login">Login</string>
-    <string name="twitter_callback_url">voicetweet://twitter</string>
+    <string name="auth_scheme">voicetweet</string>
+    <string name="auth_host">twitter</string>
 </resources>
