@@ -93,11 +93,6 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.i(TAG, "GoogleApiClient Connected");
-    }
-
     public void sendTweetAsync(String tweet){
         if(tweet == null) return;
         Log.i(TAG, "send \"" + tweet + "\" to handheld");
@@ -124,12 +119,16 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
     }
 
     @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(TAG, "GoogleApiClient Connected");
+    }
+
+    @Override
     public void onConnectionSuspended(int i) {
         String msg = "GoogleApiClient connection suspended";
         Log.i(TAG, msg);
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         finish();
-
     }
 
     @Override
