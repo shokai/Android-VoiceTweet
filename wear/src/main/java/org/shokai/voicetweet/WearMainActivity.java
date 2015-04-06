@@ -22,14 +22,15 @@ import java.util.List;
 
 public class WearMainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<MessageApi.SendMessageResult> {
 
+    public final String TAG = "MainActivity";
+
+    private final int CODE_RECOGNIZE_SPEECH = 10;
+    private final int CODE_CONFIRM_TWEET    = 11;
+    public final String MESSAGE_PATH_TWEET  = "/tweet/post";
+
     private String mTweet;
     private ImageButton mButton;
     private GoogleApiClient mGoogleApiClient;
-
-    public final String TAG = "WearMainActivity";
-    private final int CODE_RECOGNIZE_SPEECH = 567;
-    private final int CODE_CONFIRM_TWEET = 3;
-    public final String MESSAGE_PATH_TWEET = "/tweet/post";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +44,6 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
                 startSpeechRecognition();
             }
         });
-
         startSpeechRecognition();
     }
 
@@ -76,12 +76,16 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
         startActivityForResult(intent, CODE_RECOGNIZE_SPEECH);
     }
 
+    /*
+     * receive speech recognition result
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == CODE_RECOGNIZE_SPEECH &&
            resultCode == RESULT_OK){
             List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             mTweet = results.get(0);
+            if(mTweet == null || mTweet.length() < 1) return;
             Intent confirmIntent = new Intent(this, WearTweetConfirmActivity.class);
             confirmIntent.putExtra("tweet", mTweet);
             startActivityForResult(confirmIntent, CODE_CONFIRM_TWEET);
