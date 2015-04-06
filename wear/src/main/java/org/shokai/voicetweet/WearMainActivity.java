@@ -63,11 +63,11 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
     }
 
     @Override
-    protected void onStop() {
+    protected void onPause() {
         if (mGoogleApiClient != null) {
             mGoogleApiClient.disconnect();
         }
-        super.onStop();
+        super.onPause();
     }
 
     private void startSpeechRecognition(){
