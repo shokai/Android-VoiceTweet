@@ -15,18 +15,26 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.List;
 
-public class WearMainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<MessageApi.SendMessageResult> {
+public class WearMainActivity extends Activity implements
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        ResultCallback<MessageApi.SendMessageResult>,
+        MessageApi.MessageListener {
 
     public final String TAG = "MainActivity";
 
     private static final int CODE_RECOGNIZE_SPEECH = 10;
     private static final int CODE_CONFIRM_TWEET    = 11;
-    public static final String MESSAGE_PATH_TWEET  = "/tweet/post";
+
+    public final static String MESSAGE_PATH_TWEET         = "/tweet/post";
+    public final static String MESSAGE_PATH_TWEET_SUCCESS = "/tweet/post/success";
+    public final static String MESSAGE_PATH_TWEET_FAILED  = "/tweet/post/failed";
 
     private String mTweet;
     private GoogleApiClient mGoogleApiClient;
@@ -64,6 +72,7 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
     @Override
     protected void onStop() {
         if (mGoogleApiClient != null) {
+            Wearable.MessageApi.removeListener(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
         super.onStop();
@@ -124,6 +133,7 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(TAG, "GoogleApiClient Connected");
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
     }
 
     @Override
@@ -143,19 +153,34 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
     }
 
     /*
-     Result from Handheld
+     * Result from Handheld
      */
     @Override
     public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-        Intent intent = new Intent(WearMainActivity.this, ConfirmationActivity.class);
         if (sendMessageResult.getStatus().isSuccess()) {
-            Log.v(TAG, "success");
-            intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, "success");
-            intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.SUCCESS_ANIMATION);
+            Log.i("sendMessage", "success");
         }
-        else{
-            intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, "failed");
-            intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.FAILURE_ANIMATION);
+    }
+
+    /*
+     * Message from Handheld
+     */
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        String res = new String(messageEvent.getData());
+        Intent intent = new Intent(this, ConfirmationActivity.class);
+
+        switch (messageEvent.getPath()) {
+            case MESSAGE_PATH_TWEET_SUCCESS:
+                Log.i("tweet success", res);
+                intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, res);
+                intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.SUCCESS_ANIMATION);
+                break;
+            case MESSAGE_PATH_TWEET_FAILED:
+                Log.i("tweet failed", res);
+                intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, res);
+                intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.FAILURE_ANIMATION);
+                break;
         }
         startActivity(intent);
     }

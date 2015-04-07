@@ -1,10 +1,11 @@
 package org.shokai.voicetweet;
 
-import android.app.Notification;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
+
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import twitter4j.Status;
@@ -13,12 +14,25 @@ import twitter4j.TwitterException;
 
 public class TweetService extends WearableListenerService {
 
-    private final String TAG = "TweetService";
-    public final String MESSAGE_PATH_TWEET = "/tweet/post";
-    private TwitterUtil mTwitterUtil;
+    private final static String TAG = "TweetService";
+    public final static String MESSAGE_PATH_TWEET         = "/tweet/post";
+    public final static String MESSAGE_PATH_TWEET_SUCCESS = "/tweet/post/success";
+    public final static String MESSAGE_PATH_TWEET_FAILED  = "/tweet/post/failed";
 
-    public TweetService(){
+    private TwitterUtil mTwitterUtil;
+    private GoogleApiClient mGoogleApiClient;
+
+    public TweetService() {
         mTwitterUtil = new TwitterUtil(this);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .build();
+        mGoogleApiClient.connect();
     }
 
     @Override
@@ -34,38 +48,41 @@ public class TweetService extends WearableListenerService {
                 return;
             }
             Log.i(TAG, "receive from wear: "+ msg);
-            Status status = updateTweet(msg);
-            if(status != null && status.getId() > 0){
-                sendNotification("tweet success ("+msg+")");
-            }
-            else {
-                sendNotification("tweet failed ("+msg+")");
-            }
+            updateTweet(msg);
         }
-    }
-
-    private void sendNotification(String msg){
-        Log.v(TAG, "sendNotification: "+msg);
-
-        Notification notif = new NotificationCompat.Builder(this)
-                .setContentTitle(TAG)
-                .setContentText(msg)
-                .setSmallIcon(android.R.drawable.btn_default_small)
-                .build();
-
-        NotificationManagerCompat manager = NotificationManagerCompat.from(this);
-        manager.notify(0, notif);
-
     }
 
     private Status updateTweet(String tweet){
         if(!mTwitterUtil.hasToken()) return null;
         Twitter client = mTwitterUtil.getTwitterInstance();
+        Status status = null;
         try {
-            return client.updateStatus(tweet);
+            status = client.updateStatus(tweet);
         } catch (TwitterException e) {
             e.printStackTrace();
+            callback(MESSAGE_PATH_TWEET_FAILED, e.getErrorMessage());
+        }
+
+        if(status != null && status.getId() > 0){
+            callback(MESSAGE_PATH_TWEET_SUCCESS, tweet);
+            return status;
         }
         return null;
+    }
+
+    private void callback(String path, String msg){
+        Log.v(TAG, "callback: "+path+" "+msg);
+        byte[] bytes;
+        try{
+            bytes = msg.getBytes("UTF-8");
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return;
+        }
+        for (Node node : Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await().getNodes()){
+            Log.v(TAG, "sending to node:" + node.getId());
+            Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, bytes);
+        }
     }
 }
