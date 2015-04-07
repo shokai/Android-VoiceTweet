@@ -24,12 +24,11 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
 
     public final String TAG = "MainActivity";
 
-    private final int CODE_RECOGNIZE_SPEECH = 10;
-    private final int CODE_CONFIRM_TWEET    = 11;
-    public final String MESSAGE_PATH_TWEET  = "/tweet/post";
+    private static final int CODE_RECOGNIZE_SPEECH = 10;
+    private static final int CODE_CONFIRM_TWEET    = 11;
+    public static final String MESSAGE_PATH_TWEET  = "/tweet/post";
 
     private String mTweet;
-    private ImageButton mButton;
     private GoogleApiClient mGoogleApiClient;
 
     @Override
@@ -37,8 +36,8 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mButton = (ImageButton) findViewById(R.id.button);
-        mButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton button = (ImageButton) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startSpeechRecognition();
@@ -63,11 +62,11 @@ public class WearMainActivity extends Activity implements GoogleApiClient.Connec
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         if (mGoogleApiClient != null) {
             mGoogleApiClient.disconnect();
         }
-        super.onPause();
+        super.onStop();
     }
 
     private void startSpeechRecognition(){
