@@ -179,12 +179,12 @@ public class WearMainActivity extends Activity implements
 
         switch (messageEvent.getPath()) {
             case MESSAGE_PATH_TWEET_SUCCESS:
-                Log.i("tweet success", res);
+                Log.i(TAG, "Tweet Success: " + res);
                 intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, res);
                 intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.SUCCESS_ANIMATION);
                 break;
             case MESSAGE_PATH_TWEET_FAILED:
-                Log.i("tweet failed", res);
+                Log.i(TAG, "Tweet Failed: " + res);
                 intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, res);
                 intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.FAILURE_ANIMATION);
                 break;

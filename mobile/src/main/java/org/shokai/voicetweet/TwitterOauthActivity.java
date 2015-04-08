@@ -73,11 +73,11 @@ public class TwitterOauthActivity extends Activity implements View.OnClickListen
             @Override
             protected void onPostExecute(String url) {
                 if(url == null) {
-                    Log.i(TAG, "authorization URL not found");
+                    Log.e(TAG, "authorization URL not found");
                     Toast.makeText(TwitterOauthActivity.this, "Auth failed", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Log.v("authorization URL", url);
+                Log.i(TAG, "open authorization URL: " + url);
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(intent);
             }
