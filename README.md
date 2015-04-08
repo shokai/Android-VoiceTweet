@@ -2,7 +2,7 @@
 
 Voice-input then Tweet.
 
-![Circle CI Status](https://circleci.com/gh/shokai/Android-VoiceTweet.png)
+[![Circle CI Status](https://circleci.com/gh/shokai/Android-VoiceTweet.png)](https://circleci.com/gh/shokai/Android-VoiceTweet)
 
 - https://github.com/shokai/Android-VoiceTweet
 
