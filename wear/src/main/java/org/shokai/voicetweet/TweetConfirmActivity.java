@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-public class WearTweetConfirmActivity extends Activity implements DelayedConfirmationView.DelayedConfirmationListener {
+public class TweetConfirmActivity extends Activity implements DelayedConfirmationView.DelayedConfirmationListener {
 
     private final String TAG = "TweetConfirmActivity";
     private DelayedConfirmationView mDelayedView;
@@ -30,7 +30,7 @@ public class WearTweetConfirmActivity extends Activity implements DelayedConfirm
             mTextView.setText(mTweet);
         }
         mDelayedView = (DelayedConfirmationView) findViewById(R.id.delayed_confirm);
-        mDelayedView.setListener(WearTweetConfirmActivity.this);
+        mDelayedView.setListener(TweetConfirmActivity.this);
         mDelayedView.setTotalTimeMs(4000);
         mDelayedView.start();
 

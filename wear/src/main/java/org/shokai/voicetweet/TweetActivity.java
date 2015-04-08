@@ -22,7 +22,7 @@ import com.google.android.gms.wearable.Wearable;
 
 import java.util.List;
 
-public class WearMainActivity extends Activity implements
+public class TweetActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         MessageApi.MessageListener {
@@ -94,7 +94,7 @@ public class WearMainActivity extends Activity implements
             List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             mTweet = results.get(0);
             if(mTweet == null || mTweet.length() < 1) return;
-            Intent confirmIntent = new Intent(this, WearTweetConfirmActivity.class);
+            Intent confirmIntent = new Intent(this, TweetConfirmActivity.class);
             confirmIntent.putExtra("tweet", mTweet);
             startActivityForResult(confirmIntent, CODE_CONFIRM_TWEET);
         }
