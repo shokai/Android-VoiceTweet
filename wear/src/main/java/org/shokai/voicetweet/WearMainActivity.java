@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
@@ -24,7 +25,6 @@ import java.util.List;
 public class WearMainActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        ResultCallback<MessageApi.SendMessageResult>,
         MessageApi.MessageListener {
 
     public final String TAG = "MainActivity";
@@ -100,18 +100,19 @@ public class WearMainActivity extends Activity implements
         }
         if(requestCode == CODE_CONFIRM_TWEET
                 && resultCode == RESULT_OK){
-            sendTweetAsync(mTweet);
+            sendMessageToHandheldAsync(MESSAGE_PATH_TWEET, mTweet);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void sendTweetAsync(String tweet){
-        if(tweet == null) return;
-        Log.i(TAG, "send \"" + tweet + "\" to handheld");
-        new AsyncTask<String, Void, String>() {
+    public void sendMessageToHandheldAsync(String path, String msg){
+        if(msg == null) return;
+        Log.i(TAG, "sendMessageToHandheld: " + path + " " + msg);
+        new AsyncTask<String, Void, PendingResult<MessageApi.SendMessageResult>>() {
             @Override
-            protected String doInBackground(String... params) {
-                String tweet = params[0];
+            protected PendingResult<MessageApi.SendMessageResult> doInBackground(String... params) {
+                String path = params[0];
+                String tweet = params[1];
                 byte[] bytes;
                 try {
                     bytes = tweet.getBytes("UTF-8");
@@ -122,12 +123,28 @@ public class WearMainActivity extends Activity implements
                 }
                 for (Node node : Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await().getNodes()){
                     Log.v(TAG, "sending to node:" + node.getId());
-                    Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), MESSAGE_PATH_TWEET, bytes)
-                            .setResultCallback(WearMainActivity.this);
+                    return Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, bytes);
                 }
                 return null;
             }
-        }.execute(tweet);
+
+            @Override
+            protected void onPostExecute(PendingResult<MessageApi.SendMessageResult> pendingResult) {
+                if(pendingResult == null) return;
+                pendingResult.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+                    @Override
+                    public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+                        com.google.android.gms.common.api.Status stat = sendMessageResult.getStatus();
+                        if(!stat.isSuccess()){
+                            Log.e(TAG, "sendMessageToWear failed: "+stat.getStatusMessage());
+                        }
+                        else {
+                            Log.i(TAG, "sendMessageToWear success");
+                        }
+                    }
+                });
+            }
+        }.execute(path, msg);
     }
 
     @Override
@@ -150,16 +167,6 @@ public class WearMainActivity extends Activity implements
         Log.i(TAG, msg);
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         finish();
-    }
-
-    /*
-     * Result from Handheld
-     */
-    @Override
-    public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-        if (sendMessageResult.getStatus().isSuccess()) {
-            Log.i("sendMessage", "success");
-        }
     }
 
     /*
