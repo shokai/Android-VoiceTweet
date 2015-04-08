@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">VoiceTweet</string>
-    <string name="action_settings">Settings</string>
     <string name="action_login">Login</string>
     <string name="auth_scheme">voicetweet</string>
     <string name="auth_host">twitter</string>
+    <string name="title_activity_tweet_test">TweetTestActivity</string>
 </resources>

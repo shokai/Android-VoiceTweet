@@ -2,63 +2,45 @@ package org.shokai.voicetweet;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import twitter4j.Status;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+import twitter4j.User;
 
 
 public class MainActivity extends Activity {
 
+    private final static String TAG = "MainActivity";
+    public final static int CODE_TWITTER_LOGIN = 1;
+
     private TwitterUtil mTwitterUtil;
     private Twitter mTwitter;
-    private Button mButton;
-    private EditText mEditText;
+    private String mScreenName;
+
+    private ImageView mImageViewProfile;
+    private TextView mTextViewScreenName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mTwitterUtil = new TwitterUtil(this);
-        mButton = (Button) findViewById(R.id.button);
-        mEditText = (EditText) findViewById(R.id.editText);
-
-        mButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String tweet = mEditText.getText().toString();
-                new AsyncTask<String, Void, Status>(){
-                    @Override
-                    protected twitter4j.Status doInBackground(String... params) {
-                        String tweet = params[0];
-                        try {
-                            return mTwitter.updateStatus(tweet);
-                        } catch (TwitterException e) {
-                            e.printStackTrace();
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(twitter4j.Status status) {
-                        if(status != null && status.getId() > 0){
-                            Toast.makeText(MainActivity.this, "success!", Toast.LENGTH_SHORT).show();
-                        }
-                        else{
-                            Toast.makeText(MainActivity.this, "failed", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }.execute(tweet);
-            }
-        });
+        mTextViewScreenName = (TextView) findViewById(R.id.textViewScreenName);
+        mImageViewProfile = (ImageView) findViewById(R.id.imageViewProfile);
     }
 
     @Override
@@ -66,37 +48,97 @@ public class MainActivity extends Activity {
         super.onStart();
         if(mTwitterUtil.hasToken()){
             mTwitter = mTwitterUtil.getTwitterInstance();
-            mButton.setVisibility(View.VISIBLE);
-            mEditText.setVisibility(View.VISIBLE);
+            displayTwitterScreenName();
         }
         else{
-            mButton.setVisibility(View.INVISIBLE);
-            mEditText.setVisibility(View.INVISIBLE);
+            mTextViewScreenName.setVisibility(View.INVISIBLE);
+            mImageViewProfile.setVisibility(View.INVISIBLE);
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
-        if(!mTwitterUtil.hasToken()) {
-            MenuItem itemSettings = menu.findItem(R.id.action_settings);
-            itemSettings.setVisible(false);
-        }
-        return true;
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem itemTweetTest = menu.findItem(R.id.action_tweet_test);
+        itemTweetTest.setVisible(BuildConfig.DEBUG && mTwitterUtil.hasToken());
+
+        MenuItem itemLogin = menu.findItem(R.id.action_login);
+        itemLogin.setTitle(mTwitterUtil.hasToken() ? "Logout" : "Login");
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                return true;
             case R.id.action_login:
-                Intent intent = new Intent(this, TwitterOauthActivity.class);
-                startActivityForResult(intent, 0);
+                Intent intent = new Intent(this, TwitterOAuthActivity.class);
+                startActivityForResult(intent, CODE_TWITTER_LOGIN);
+                return true;
+            case R.id.action_tweet_test:
+                startActivity(new Intent(MainActivity.this, TweetTestActivity.class));
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void displayTwitterScreenName() {
+        if(mTwitter == null) return;
+        new AsyncTask<Void, Void, String>(){
+            @Override
+            protected String doInBackground(Void... params) {
+                try {
+                    return mScreenName = mTwitter.getScreenName();
+                } catch (TwitterException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String screen_name) {
+                if(mScreenName == null) return;
+                mScreenName = screen_name;
+                Log.i(TAG, "screen_name: " + screen_name);
+                mTextViewScreenName.setText("@" + screen_name);
+                mTextViewScreenName.setVisibility(View.VISIBLE);
+                displayTwitterProfileImage(screen_name);
+            }
+        }.execute();
+    }
+
+    private void displayTwitterProfileImage(final String screen_name){
+        if(mTwitter == null) return;
+        new AsyncTask<Void, Void, Bitmap>(){
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                try {
+                    User user = mTwitter.showUser(screen_name);
+                    URL imageUrl = new URL(user.getBiggerProfileImageURL());
+                    return BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (TwitterException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap profileImage) {
+                if(profileImage == null) return;
+                Log.i(TAG, "load profile image");
+                mImageViewProfile.setImageBitmap(profileImage);
+                mImageViewProfile.setVisibility(View.VISIBLE);
+            }
+        }.execute();
+    }
+
 }

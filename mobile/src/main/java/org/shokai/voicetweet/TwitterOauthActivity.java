@@ -7,8 +7,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import twitter4j.Twitter;
@@ -16,7 +14,7 @@ import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
-public class TwitterOauthActivity extends Activity implements View.OnClickListener {
+public class TwitterOAuthActivity extends Activity {
 
     private final String TAG = "TwitterOauthActivity";
 
@@ -32,29 +30,17 @@ public class TwitterOauthActivity extends Activity implements View.OnClickListen
         setContentView(R.layout.activity_twitter_oauth);
 
         mTwitterUtil = new TwitterUtil(this);
-        mTwitter = mTwitterUtil.getTwitterInstance();
+        if(mTwitterUtil.hasToken()){
+            mTwitterUtil.logout();
+            Toast.makeText(this, "Logout", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
+        mTwitter = mTwitterUtil.getTwitterInstance();
         Resources resources = getResources();
         mCallbackUrl = resources.getString(R.string.auth_scheme)+"://"+resources.getString(R.string.auth_host);
-
-        Button buttonLogin = (Button)findViewById(R.id.button_login);
-        if(mTwitterUtil.hasToken()) {
-            buttonLogin.setText("Logout");
-        }
-        buttonLogin.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        if(v.getId() != R.id.button_login) return;
-
-        if(mTwitterUtil.hasToken()) {
-            mTwitterUtil.logout();
-            finish();
-        }
-        else {
-            authStart();
-        }
+        authStart();
     }
 
     public void authStart(){
@@ -74,7 +60,7 @@ public class TwitterOauthActivity extends Activity implements View.OnClickListen
             protected void onPostExecute(String url) {
                 if(url == null) {
                     Log.e(TAG, "authorization URL not found");
-                    Toast.makeText(TwitterOauthActivity.this, "Auth failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TwitterOAuthActivity.this, "Auth failed", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Log.i(TAG, "open authorization URL: " + url);
@@ -110,7 +96,7 @@ public class TwitterOauthActivity extends Activity implements View.OnClickListen
     }
 
     private void authSuccess(AccessToken token){
-        Toast.makeText(this, "auth success!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Login", Toast.LENGTH_SHORT).show();
         mTwitterUtil.setAccessToken(token.getToken());
         mTwitterUtil.setAccessTokenSecret(token.getTokenSecret());
         finish();
