@@ -3,6 +3,9 @@ package org.shokai.voicetweet;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
@@ -12,7 +15,8 @@ import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
-public class TweetService extends WearableListenerService {
+public class TweetService extends WearableListenerService implements
+        ResultCallback<MessageApi.SendMessageResult> {
 
     private final static String TAG = "TweetService";
     public final static String MESSAGE_PATH_TWEET         = "/tweet/post";
@@ -60,18 +64,18 @@ public class TweetService extends WearableListenerService {
             status = client.updateStatus(tweet);
         } catch (TwitterException e) {
             e.printStackTrace();
-            callback(MESSAGE_PATH_TWEET_FAILED, e.getErrorMessage());
+            sendMessageToWear(MESSAGE_PATH_TWEET_FAILED, e.getErrorMessage(), this);
         }
 
         if(status != null && status.getId() > 0){
-            callback(MESSAGE_PATH_TWEET_SUCCESS, tweet);
+            sendMessageToWear(MESSAGE_PATH_TWEET_SUCCESS, tweet, this);
             return status;
         }
         return null;
     }
 
-    private void callback(String path, String msg){
-        Log.v(TAG, "callback: "+path+" "+msg);
+    private void sendMessageToWear(String path, String msg, ResultCallback<MessageApi.SendMessageResult> callback){
+        Log.v(TAG, "sendMessageToWear: "+path+" "+msg);
         byte[] bytes;
         try{
             bytes = msg.getBytes("UTF-8");
@@ -82,7 +86,24 @@ public class TweetService extends WearableListenerService {
         }
         for (Node node : Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await().getNodes()){
             Log.v(TAG, "sending to node:" + node.getId());
-            Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, bytes);
+            PendingResult<MessageApi.SendMessageResult> res = Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, bytes);
+            if(callback != null){
+                res.setResultCallback(callback);
+            }
+        }
+    }
+
+    @Override
+    public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+        com.google.android.gms.common.api.Status stat = sendMessageResult.getStatus();
+        if(!stat.isSuccess()){
+            Log.e(TAG, "sendMessageToWear failed: " + stat.getStatusMessage());
+        }
+        else {
+            Log.i(TAG, "sendMessageToWear success");
+        }
+        if(mGoogleApiClient != null && mGoogleApiClient.isConnected()){
+            mGoogleApiClient.disconnect();
         }
     }
 }
