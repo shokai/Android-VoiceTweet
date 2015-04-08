@@ -1,0 +1,5 @@
+test:
+  pre:
+    - cd mobile/src/main/java/org/shokai/voicetweet/ && cp TwitterConfig.java.sample TwitterConfig.java
+  override:
+    - ./gradlew assembleDebug
