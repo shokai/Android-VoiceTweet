@@ -2,8 +2,9 @@
 
 Voice-input then Tweet.
 
-- https://github.com/shokai/Android-VoiceTweet
+![Circle CI Status](https://circleci.com/gh/shokai/Android-VoiceTweet.png)
 
+- https://github.com/shokai/Android-VoiceTweet
 
 ## Requirements
 
