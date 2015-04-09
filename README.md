@@ -6,11 +6,18 @@ Voice-input then Tweet.
 
 - https://github.com/shokai/Android-VoiceTweet
 
+## Install apk
+
+- [latest release](https://github.com/shokai/Android-VoiceTweet/releases/latest)
+
+
+# Develop
+
 ## Requirements
 
 - Android
-- Android Wear
-- Android Studio
+- [Android Wear](https://developer.android.com/wear/)
+- [Android Studio](https://developer.android.com/sdk/)
 
 
 ## Twitter Config
@@ -24,4 +31,9 @@ Voice-input then Tweet.
 
 ## Build
 
-use Android Studio.
+use Android Studio or run `./gradlew assembleDebug`
+
+
+# License
+
+MIT
