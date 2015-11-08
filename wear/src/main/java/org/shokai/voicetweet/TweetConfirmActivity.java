@@ -31,7 +31,7 @@ public class TweetConfirmActivity extends Activity implements DelayedConfirmatio
         }
         mDelayedView = (DelayedConfirmationView) findViewById(R.id.delayed_confirm);
         mDelayedView.setListener(TweetConfirmActivity.this);
-        mDelayedView.setTotalTimeMs(6000);
+        mDelayedView.setTotalTimeMs(3000 + mTweet.length()*100);
         mDelayedView.start();
 
     }
