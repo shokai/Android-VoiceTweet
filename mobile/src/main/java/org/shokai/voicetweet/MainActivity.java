@@ -44,14 +44,14 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         if(mTwitterUtil.hasToken()){
             mTwitter = mTwitterUtil.getTwitterInstance();
             displayTwitterScreenName();
         }
         else{
-            mTextViewScreenName.setVisibility(View.INVISIBLE);
+            mTextViewScreenName.setText(getResources().getText(R.string.text_screen_name));
             mImageViewProfile.setVisibility(View.INVISIBLE);
         }
     }
@@ -106,7 +106,6 @@ public class MainActivity extends Activity {
                 mScreenName = screen_name;
                 Log.i(TAG, "screen_name: " + screen_name);
                 mTextViewScreenName.setText("@" + screen_name);
-                mTextViewScreenName.setVisibility(View.VISIBLE);
                 displayTwitterProfileImage(screen_name);
             }
         }.execute();
