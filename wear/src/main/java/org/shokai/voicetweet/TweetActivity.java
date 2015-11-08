@@ -92,6 +92,7 @@ public class TweetActivity extends Activity implements
         if(requestCode == CODE_RECOGNIZE_SPEECH &&
            resultCode == RESULT_OK){
             List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if(results.isEmpty()) return;
             mTweet = results.get(0);
             if(mTweet == null || mTweet.length() < 1) return;
             Intent confirmIntent = new Intent(this, TweetConfirmActivity.class);
