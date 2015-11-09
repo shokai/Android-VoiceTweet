@@ -29,3 +29,9 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+apt {
+    arguments {
+        androidManifestFile variant.outputs[0].processResources.manifestFile
+    }
+}

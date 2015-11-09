@@ -13,6 +13,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,7 +24,7 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.User;
 
-
+@EActivity(R.layout.activity_main)
 public class MainActivity extends Activity {
 
     private final static String TAG = "MainActivity";
@@ -31,16 +34,16 @@ public class MainActivity extends Activity {
     private Twitter mTwitter;
     private String mScreenName;
 
-    private ImageView mImageViewProfile;
-    private TextView mTextViewScreenName;
+    @ViewById(R.id.imageViewProfile)
+    ImageView mImageViewProfile;
+
+    @ViewById(R.id.textViewScreenName)
+    TextView mTextViewScreenName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         mTwitterUtil = new TwitterUtil(this);
-        mTextViewScreenName = (TextView) findViewById(R.id.textViewScreenName);
-        mImageViewProfile = (ImageView) findViewById(R.id.imageViewProfile);
     }
 
     @Override
