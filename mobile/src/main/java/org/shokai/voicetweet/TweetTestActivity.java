@@ -2,7 +2,6 @@ package org.shokai.voicetweet;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -22,9 +21,6 @@ public class TweetTestActivity extends Activity {
     private Twitter mTwitter;
     private TwitterUtil mTwitterUtil;
 
-    @ViewById(R.id.button)
-    Button mButton;
-
     @ViewById(R.id.editText)
     EditText mEditText;
 
@@ -36,8 +32,8 @@ public class TweetTestActivity extends Activity {
         mTwitter = mTwitterUtil.getTwitterInstance();
     }
 
-    @Click
-    void button() {
+    @Click(R.id.button)
+    void onButtonClick(){
         updateTweetAsync(mEditText.getText().toString());
     }
 
