@@ -83,7 +83,7 @@ public class MainActivity extends Activity {
                 startActivityForResult(intent, CODE_TWITTER_LOGIN);
                 return true;
             case R.id.action_tweet_test:
-                startActivity(new Intent(MainActivity.this, TweetTestActivity.class));
+                startActivity(new Intent(MainActivity.this, TweetTestActivity_.class));
                 return true;
         }
 

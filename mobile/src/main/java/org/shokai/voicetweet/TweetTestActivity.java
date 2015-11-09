@@ -1,62 +1,65 @@
 package org.shokai.voicetweet;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import twitter4j.Status;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 
+@EActivity(R.layout.activity_tweet_test)
 public class TweetTestActivity extends Activity {
 
     private Twitter mTwitter;
     private TwitterUtil mTwitterUtil;
-    private Button mButton;
-    private EditText mEditText;
+
+    @ViewById(R.id.button)
+    Button mButton;
+
+    @ViewById(R.id.editText)
+    EditText mEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tweet_test);
 
         mTwitterUtil = new TwitterUtil(this);
         mTwitter = mTwitterUtil.getTwitterInstance();
-        mButton = (Button) findViewById(R.id.button);
-        mEditText = (EditText) findViewById(R.id.editText);
-
-        mButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String tweet = mEditText.getText().toString();
-                new AsyncTask<String, Void, Status>() {
-                    @Override
-                    protected twitter4j.Status doInBackground(String... params) {
-                        String tweet = params[0];
-                        try {
-                            return mTwitter.updateStatus(tweet);
-                        } catch (TwitterException e) {
-                            e.printStackTrace();
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(twitter4j.Status status) {
-                        if (status != null && status.getId() > 0) {
-                            Toast.makeText(TweetTestActivity.this, "success!", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(TweetTestActivity.this, "failed", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }.execute(tweet);
-            }
-
-        });
     }
+
+    @Click
+    void button() {
+        updateTweetAsync(mEditText.getText().toString());
+    }
+
+    @Background
+    void updateTweetAsync(String tweet) {
+        try {
+            twitter4j.Status res = mTwitter.updateStatus(tweet);
+            if (res == null || !(res.getId() > 0)) {
+                displayTweetResult("failed");
+                return;
+            }
+        } catch (TwitterException e) {
+            e.printStackTrace();
+            displayTweetResult(e.getMessage());
+            return;
+        }
+        displayTweetResult("success");
+    }
+
+    @UiThread
+    void displayTweetResult(String message) {
+        Toast.makeText(TweetTestActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
+
 }

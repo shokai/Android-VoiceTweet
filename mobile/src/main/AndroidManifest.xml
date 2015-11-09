@@ -41,7 +41,7 @@
         </service>
 
         <activity
-            android:name=".TweetTestActivity"
+            android:name=".TweetTestActivity_"
             android:label="@string/title_activity_tweet_test" >
         </activity>
     </application>
