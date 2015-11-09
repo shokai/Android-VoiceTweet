@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TwitterOAuthActivity"
+            android:name=".TwitterOAuthActivity_"
             android:label="Twitter Login"
             android:launchMode="singleTask" >
             <intent-filter>

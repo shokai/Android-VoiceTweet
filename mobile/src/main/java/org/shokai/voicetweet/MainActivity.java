@@ -1,7 +1,6 @@
 package org.shokai.voicetweet;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -78,8 +77,7 @@ public class MainActivity extends Activity {
 
     @OptionsItem(R.id.action_login)
     void login(){
-        Intent intent = new Intent(this, TwitterOAuthActivity.class);
-        startActivityForResult(intent, CODE_TWITTER_LOGIN);
+        TwitterOAuthActivity_.intent(this).startForResult(CODE_TWITTER_LOGIN);
     }
 
     @OptionsItem(R.id.action_tweet_test)

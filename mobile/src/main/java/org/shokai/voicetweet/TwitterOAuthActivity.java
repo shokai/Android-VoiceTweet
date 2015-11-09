@@ -9,11 +9,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.androidannotations.annotations.EActivity;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
+@EActivity(R.layout.activity_twitter_oauth)
 public class TwitterOAuthActivity extends Activity {
 
     private final String TAG = "TwitterOauthActivity";
@@ -27,7 +30,6 @@ public class TwitterOAuthActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_twitter_oauth);
 
         mTwitterUtil = new TwitterUtil(this);
         if(mTwitterUtil.hasToken()){
