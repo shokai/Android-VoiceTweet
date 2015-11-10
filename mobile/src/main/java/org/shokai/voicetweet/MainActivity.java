@@ -36,6 +36,7 @@ public class MainActivity extends Activity {
 
     private TwitterUtil mTwitterUtil;
     private Twitter mTwitter;
+    private String mScreenName = null;
 
     @ViewById(R.id.imageViewProfile)
     ImageView mImageViewProfile;
@@ -61,6 +62,7 @@ public class MainActivity extends Activity {
         if(mTwitterUtil.hasToken()){
             mTwitter = mTwitterUtil.getTwitterInstance();
             getTwitterScreenNameAsync();
+            getTwitterProfileImageAsync();
         }
         else{
             mTextViewScreenName.setText(getResources().getText(R.string.text_screen_name));
@@ -85,13 +87,14 @@ public class MainActivity extends Activity {
         TweetTestActivity_.intent(this).start();
     }
 
-    @Background
+    @Background(serial = "twitter")
     void getTwitterScreenNameAsync(){
         if(mTwitter == null) return;
         try {
-            String name = mTwitter.getScreenName();
-            displayTwitterScreenName(name);
-            getTwitterProfileImageAsync(name);
+            mScreenName = mTwitter.getScreenName();
+            Log.i(TAG, "screen_name: @" + mScreenName);
+            displayTwitterScreenName(mScreenName);
+
         } catch (TwitterException e) {
             e.printStackTrace();
         }
@@ -99,16 +102,18 @@ public class MainActivity extends Activity {
 
     @UiThread
     void displayTwitterScreenName(String name){
-        Log.i(TAG, "screen_name: " + name);
         mTextViewScreenName.setText("@" + name);
     }
 
-    @Background
-    void getTwitterProfileImageAsync(String screenName) {
+    @Background(serial = "twitter")
+    void getTwitterProfileImageAsync() {
+        Log.i(TAG, "getTWitterProfileImageAsync()");
+        if(mScreenName == null) return;
         try {
-            User user = mTwitter.showUser(screenName);
+            User user = mTwitter.showUser(mScreenName);
             URL imageUrl = new URL(user.getBiggerProfileImageURL());
             Bitmap profileImage = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
+            Log.i(TAG, "load profile image");
             displayTwitterProfileImage(profileImage);
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -121,7 +126,6 @@ public class MainActivity extends Activity {
 
     @UiThread
     void displayTwitterProfileImage(Bitmap image){
-        Log.i(TAG, "load profile image");
         mImageViewProfile.setImageBitmap(image);
         mImageViewProfile.setVisibility(View.VISIBLE);
     }
