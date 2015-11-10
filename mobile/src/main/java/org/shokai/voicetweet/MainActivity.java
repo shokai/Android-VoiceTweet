@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         if(mTwitterUtil.hasToken()){
+            mTextViewScreenName.setText("Loading..");
             mTwitter = mTwitterUtil.getTwitterInstance();
             getTwitterScreenNameAsync();
             getTwitterProfileImageAsync();
