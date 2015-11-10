@@ -1,39 +1,40 @@
 package org.shokai.voicetweet;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
 import android.support.wearable.view.DelayedConfirmationView;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_tweet_confirm)
 public class TweetConfirmActivity extends Activity implements DelayedConfirmationView.DelayedConfirmationListener {
 
     private final String TAG = "TweetConfirmActivity";
-    private DelayedConfirmationView mDelayedView;
-    private TextView mTextView;
-    private String mTweet;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tweet_confirm);
+    @ViewById(R.id.delayed_confirm)
+    DelayedConfirmationView mDelayedView;
 
-        Intent intent = getIntent();
-        if(intent != null){
-            mTweet = intent.getExtras().getString("tweet");
+    @ViewById(R.id.text)
+    TextView mTextView;
+
+    @Extra("tweet")
+    String mTweet;
+
+    @AfterViews
+    void afterViews(){
+        if(mTweet == null){
+            Log.e(TAG, "tweet is empty");
+            finish();
         }
-
-        mTextView = (TextView) findViewById(R.id.text);
-        if(mTweet != null) {
-            mTextView.setText(mTweet);
-        }
-        mDelayedView = (DelayedConfirmationView) findViewById(R.id.delayed_confirm);
+        mTextView.setText(mTweet);
         mDelayedView.setListener(TweetConfirmActivity.this);
         mDelayedView.setTotalTimeMs(3000 + mTweet.length()*100);
         mDelayedView.start();
-
     }
 
     @Override

@@ -95,7 +95,7 @@ public class TweetActivity extends Activity implements
             if(results.isEmpty()) return;
             mTweet = results.get(0);
             if(mTweet == null || mTweet.length() < 1) return;
-            Intent confirmIntent = new Intent(this, TweetConfirmActivity.class);
+            Intent confirmIntent = new Intent(this, TweetConfirmActivity_.class);
             confirmIntent.putExtra("tweet", mTweet);
             startActivityForResult(confirmIntent, CODE_CONFIRM_TWEET);
         }
