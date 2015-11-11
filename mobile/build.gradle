@@ -22,6 +22,7 @@ android {
 
 dependencies {
     wearApp project(':wear')
+    compile 'com.google.android.support:wearable:1.1.0'
     compile 'com.google.android.gms:play-services:+'
     compile 'org.twitter4j:twitter4j-core:4.0.3'
     apt "org.androidannotations:androidannotations:3.3.2"

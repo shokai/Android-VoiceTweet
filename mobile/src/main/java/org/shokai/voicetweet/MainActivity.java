@@ -11,6 +11,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Wearable;
+
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
@@ -29,14 +33,19 @@ import twitter4j.User;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.menu_main)
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     private final static String TAG = "MainActivity";
     public final static int CODE_TWITTER_LOGIN = 1;
 
+    public final static String MESSAGE_PATH_LAUNCH_APP = "/app/launch";
+
     private TwitterUtil mTwitterUtil;
     private Twitter mTwitter;
     private String mScreenName = null;
+    private GoogleApiClient mGoogleApiClient;
 
     @ViewById(R.id.imageViewProfile)
     ImageView mImageViewProfile;
@@ -57,6 +66,29 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTwitterUtil = new TwitterUtil(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(Wearable.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+        }
+        if (!mGoogleApiClient.isConnected()){
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
     }
 
     @Override
@@ -85,11 +117,6 @@ public class MainActivity extends Activity {
     @OptionsItem(R.id.action_login)
     void login(){
         TwitterOAuthActivity_.intent(this).startForResult(CODE_TWITTER_LOGIN);
-    }
-
-    @OptionsItem(R.id.action_launch_wear)
-    void launchWearApp(){
-        Log.i(TAG, "launch wear app");
     }
 
     @OptionsItem(R.id.action_tweet_test)
@@ -138,6 +165,28 @@ public class MainActivity extends Activity {
     void displayTwitterProfileImage(Bitmap image){
         mImageViewProfile.setImageBitmap(image);
         mImageViewProfile.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(TAG, "GoogleApiClient Connected");
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.i(TAG, "GoogleApiClient connection suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e(TAG, "GoogleApiClient connection failed");
+    }
+
+
+    @Background
+    @OptionsItem(R.id.action_launch_wear)
+    void launchWearApp(){
+        Log.i(TAG, "launch wear app");
     }
 
 }
