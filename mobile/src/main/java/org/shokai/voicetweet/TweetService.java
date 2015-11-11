@@ -11,6 +11,8 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.io.UnsupportedEncodingException;
+
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -46,9 +48,8 @@ public class TweetService extends WearableListenerService implements
             String msg;
             try {
                 msg = new String(messageEvent.getData(), "UTF-8");
-            }
-            catch (Exception ex){
-                Log.e(TAG, ex.getMessage());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
                 return;
             }
             Log.i(TAG, "receive from wear: "+ msg);
