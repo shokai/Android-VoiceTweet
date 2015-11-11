@@ -6,6 +6,11 @@
         android:orderInCategory="101"
         />
     <item
+        android:id="@+id/action_launch_wear"
+        android:title="Launch Wear App"
+        android:orderInCategory="102"
+        />
+    <item
         android:id="@+id/action_tweet_test"
         android:title="Tweet Test"
         android:orderInCategory="202"

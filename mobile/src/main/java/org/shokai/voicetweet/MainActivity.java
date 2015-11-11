@@ -44,6 +44,9 @@ public class MainActivity extends Activity {
     @ViewById(R.id.textViewScreenName)
     TextView mTextViewScreenName;
 
+    @OptionsMenuItem(R.id.action_launch_wear)
+    MenuItem mItemLaunchWear;
+
     @OptionsMenuItem(R.id.action_tweet_test)
     MenuItem mItemTweetTest;
 
@@ -74,6 +77,7 @@ public class MainActivity extends Activity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         mItemTweetTest.setVisible(BuildConfig.DEBUG && mTwitterUtil.hasToken());
+        mItemLaunchWear.setVisible(mTwitterUtil.hasToken());
         mItemLogin.setTitle(mTwitterUtil.hasToken() ? "Logout" : "Login");
         return super.onPrepareOptionsMenu(menu);
     }
@@ -81,6 +85,11 @@ public class MainActivity extends Activity {
     @OptionsItem(R.id.action_login)
     void login(){
         TwitterOAuthActivity_.intent(this).startForResult(CODE_TWITTER_LOGIN);
+    }
+
+    @OptionsItem(R.id.action_launch_wear)
+    void launchWearApp(){
+        Log.i(TAG, "launch wear app");
     }
 
     @OptionsItem(R.id.action_tweet_test)
