@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.DeviceDefault" >
         <activity
-            android:name=".TweetActivity"
+            android:name=".TweetActivity_"
             android:launchMode="singleTask"
             android:label="@string/app_name" >
             <intent-filter>

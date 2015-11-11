@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.wearable.activity.ConfirmationActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -20,8 +18,13 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.OnActivityResult;
+
 import java.util.List;
 
+@EActivity(R.layout.activity_tweet)
 public class TweetActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -39,18 +42,14 @@ public class TweetActivity extends Activity implements
     private String mTweet;
     private GoogleApiClient mGoogleApiClient;
 
+    @Click(R.id.button)
+    void onButtonClick(){
+        startSpeechRecognition();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        ImageButton button = (ImageButton) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startSpeechRecognition();
-            }
-        });
         startSpeechRecognition();
     }
 
@@ -84,26 +83,22 @@ public class TweetActivity extends Activity implements
         startActivityForResult(intent, CODE_RECOGNIZE_SPEECH);
     }
 
-    /*
-     * receive speech recognition result
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == CODE_RECOGNIZE_SPEECH &&
-           resultCode == RESULT_OK){
-            List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            if(results.isEmpty()) return;
-            mTweet = results.get(0);
-            if(mTweet == null || mTweet.length() < 1) return;
-            Intent confirmIntent = new Intent(this, TweetConfirmActivity_.class);
-            confirmIntent.putExtra("tweet", mTweet);
-            startActivityForResult(confirmIntent, CODE_CONFIRM_TWEET);
-        }
-        if(requestCode == CODE_CONFIRM_TWEET
-                && resultCode == RESULT_OK){
-            sendMessageToHandheldAsync(MESSAGE_PATH_TWEET, mTweet);
-        }
-        super.onActivityResult(requestCode, resultCode, data);
+    @OnActivityResult(CODE_RECOGNIZE_SPEECH)
+    void onRecognizeSpeech(int resultCode, Intent data){
+        if(resultCode != RESULT_OK) return;
+        List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+        if(results.isEmpty()) return;
+        mTweet = results.get(0);
+        if(mTweet == null || mTweet.length() < 1) return;
+        Intent confirmIntent = new Intent(this, TweetConfirmActivity_.class);
+        confirmIntent.putExtra("tweet", mTweet);
+        startActivityForResult(confirmIntent, CODE_CONFIRM_TWEET);
+    }
+
+    @OnActivityResult(CODE_CONFIRM_TWEET)
+    void onConfirmTweet(int resultCode){
+        if(resultCode != RESULT_OK) return;
+        sendMessageToHandheldAsync(MESSAGE_PATH_TWEET, mTweet);
     }
 
     public void sendMessageToHandheldAsync(String path, String msg){
