@@ -58,7 +58,10 @@ public class TweetService extends WearableListenerService implements
     }
 
     private Status updateTweet(String tweet){
-        if(!mTwitterUtil.hasToken()) return null;
+        if(!mTwitterUtil.hasToken()){
+            sendMessageToWear(MESSAGE_PATH_TWEET_FAILED, "Please Login", this);
+            return null;
+        }
         Twitter client = mTwitterUtil.getTwitterInstance();
         Status status = null;
         try {
