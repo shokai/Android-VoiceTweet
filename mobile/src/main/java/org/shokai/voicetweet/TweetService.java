@@ -21,9 +21,6 @@ public class TweetService extends WearableListenerService implements
         ResultCallback<MessageApi.SendMessageResult> {
 
     private final static String TAG = "TweetService";
-    public final static String MESSAGE_PATH_TWEET         = "/tweet/post";
-    public final static String MESSAGE_PATH_TWEET_SUCCESS = "/tweet/post/success";
-    public final static String MESSAGE_PATH_TWEET_FAILED  = "/tweet/post/failed";
 
     private TwitterUtil mTwitterUtil;
     private GoogleApiClient mGoogleApiClient;
@@ -44,7 +41,7 @@ public class TweetService extends WearableListenerService implements
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.v(TAG, "onMessageReceived");
-        if (messageEvent.getPath().equals(MESSAGE_PATH_TWEET)) {
+        if (messageEvent.getPath().equals(MessagePath.TWEET)) {
             String msg;
             try {
                 msg = new String(messageEvent.getData(), "UTF-8");
@@ -59,7 +56,7 @@ public class TweetService extends WearableListenerService implements
 
     private Status updateTweet(String tweet){
         if(!mTwitterUtil.hasToken()){
-            sendMessageToWear(MESSAGE_PATH_TWEET_FAILED, "Please Login", this);
+            sendMessageToWear(MessagePath.TWEET_FAILED, "Please Login", this);
             return null;
         }
         Twitter client = mTwitterUtil.getTwitterInstance();
@@ -68,11 +65,11 @@ public class TweetService extends WearableListenerService implements
             status = client.updateStatus(tweet);
         } catch (TwitterException e) {
             e.printStackTrace();
-            sendMessageToWear(MESSAGE_PATH_TWEET_FAILED, e.getErrorMessage(), this);
+            sendMessageToWear(MessagePath.TWEET_FAILED, e.getErrorMessage(), this);
         }
 
         if(status != null && status.getId() > 0){
-            sendMessageToWear(MESSAGE_PATH_TWEET_SUCCESS, tweet, this);
+            sendMessageToWear(MessagePath.TWEET_SUCCESS, tweet, this);
             return status;
         }
         return null;

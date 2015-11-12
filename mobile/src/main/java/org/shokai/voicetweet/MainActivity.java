@@ -1,6 +1,5 @@
 package org.shokai.voicetweet;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -10,10 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.Wearable;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
@@ -33,19 +28,14 @@ import twitter4j.User;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.menu_main)
-public class MainActivity extends Activity implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends GoogleApiClientActivity {
 
-    private final static String TAG = "MainActivity";
+    public final static String TAG = "MainActivity";
     public final static int CODE_TWITTER_LOGIN = 1;
-
-    public final static String MESSAGE_PATH_LAUNCH_APP = "/app/launch";
 
     private TwitterUtil mTwitterUtil;
     private Twitter mTwitter;
     private String mScreenName = null;
-    private GoogleApiClient mGoogleApiClient;
 
     @ViewById(R.id.imageViewProfile)
     ImageView mImageViewProfile;
@@ -68,28 +58,6 @@ public class MainActivity extends Activity implements
         mTwitterUtil = new TwitterUtil(this);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(Wearable.API)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
-        }
-        if (!mGoogleApiClient.isConnected()){
-            mGoogleApiClient.connect();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.disconnect();
-        }
-        super.onStop();
-    }
 
     @Override
     protected void onResume() {
@@ -167,23 +135,6 @@ public class MainActivity extends Activity implements
         mImageViewProfile.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.i(TAG, "GoogleApiClient Connected");
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.i(TAG, "GoogleApiClient connection suspended");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.e(TAG, "GoogleApiClient connection failed");
-    }
-
-
-    @Background
     @OptionsItem(R.id.action_launch_wear)
     void launchWearApp(){
         Log.i(TAG, "launch wear app");
