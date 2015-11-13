@@ -39,12 +39,6 @@ public class TweetActivity extends GoogleApiClientActivity implements
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        startSpeechRecognition();
-    }
-
-    @Override
     protected void onResume(){
         super.onResume();
         final TweetActivity self = this;
@@ -52,12 +46,12 @@ public class TweetActivity extends GoogleApiClientActivity implements
                 .setResultCallback(new ResultCallback<DataItemBuffer>() {
                     @Override
                     public void onResult(DataItemBuffer dataItems) {
-                        for (DataItem dataItem : dataItems){
-                            if(dataItem.getUri().getPath().equals(MessagePath.ROOT)){
+                        for (DataItem dataItem : dataItems) {
+                            if (dataItem.getUri().getPath().equals(MessagePath.ROOT)) {
                                 DataMap dataMap = DataMap.fromByteArray(dataItem.getData());
                                 boolean login = dataMap.getBoolean(MessagePath.IS_LOGIN);
                                 Log.v(TAG, "twitter login :" + login);
-                                if(!login){
+                                if (!login) {
                                     LaunchPhoneAppActivity_.intent(self).start();
                                 }
                             }
@@ -89,6 +83,12 @@ public class TweetActivity extends GoogleApiClientActivity implements
     void onConfirmTweet(int resultCode){
         if(resultCode != RESULT_OK) return;
         sendMessageAsync(MessagePath.TWEET, mTweet);
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(TAG, "GoogleApiClient Connected");
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
     }
 
     @Override
