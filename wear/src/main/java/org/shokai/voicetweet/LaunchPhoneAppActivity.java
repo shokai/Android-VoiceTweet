@@ -28,7 +28,7 @@ public class LaunchPhoneAppActivity extends GoogleApiClientActivity implements
 
     @AfterViews
     void showLoginMessage(){
-        Toast.makeText(this, "Login Twitter", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Login Twitter", Toast.LENGTH_LONG).show();
     }
 
     @Click(R.id.button)

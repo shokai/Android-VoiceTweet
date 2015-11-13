@@ -23,7 +23,7 @@
         android:background="@drawable/round_box"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="15dp"
+        android:padding="7dp"
         android:text="@string/button_text"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
