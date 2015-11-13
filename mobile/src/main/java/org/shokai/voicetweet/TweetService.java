@@ -59,7 +59,7 @@ public class TweetService extends WearableListenerService implements
                 Intent intent = new Intent(this, MainActivity_.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 this.startActivity(intent);
-                sendMessageToWear(MessagePath.LAUNCH_APP_SUCCESS, "Launch App Success", this);
+                sendMessageToWear(MessagePath.LAUNCH_APP_SUCCESS, "done", this);
         }
     }
 
