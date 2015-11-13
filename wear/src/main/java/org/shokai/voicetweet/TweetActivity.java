@@ -7,11 +7,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.wearable.DataItem;
-import com.google.android.gms.wearable.DataItemBuffer;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.Wearable;
 
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
@@ -35,26 +30,9 @@ public class TweetActivity extends GoogleApiClientActivity {
     }
 
     @Override
-    protected void onResume(){
-        super.onResume();
-        final TweetActivity self = this;
-        Wearable.DataApi.getDataItems(mGoogleApiClient)
-                .setResultCallback(new ResultCallback<DataItemBuffer>() {
-                    @Override
-                    public void onResult(DataItemBuffer dataItems) {
-                        for (DataItem dataItem : dataItems) {
-                            if (dataItem.getUri().getPath().equals(MessagePath.ROOT)) {
-                                DataMap dataMap = DataMap.fromByteArray(dataItem.getData());
-                                boolean login = dataMap.getBoolean(MessagePath.IS_LOGIN);
-                                Log.v(TAG, "twitter login :" + login);
-                                if (!login) {
-                                    LaunchPhoneAppActivity_.intent(self).start();
-                                }
-                            }
-                        }
-                        dataItems.release();
-                    }
-                });
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        startSpeechRecognition();
     }
 
     private void startSpeechRecognition(){
