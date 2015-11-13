@@ -74,9 +74,10 @@ public class TweetActivity extends GoogleApiClientActivity implements
         if(results.isEmpty()) return;
         mTweet = results.get(0);
         if(mTweet == null || mTweet.length() < 1) return;
-        Intent confirmIntent = new Intent(this, TweetConfirmActivity_.class);
-        confirmIntent.putExtra("tweet", mTweet);
-        startActivityForResult(confirmIntent, CODE_CONFIRM_TWEET);
+        TweetConfirmActivity_
+                .intent(this)
+                .extra("tweet", mTweet)
+                .startForResult(CODE_CONFIRM_TWEET);
     }
 
     @OnActivityResult(CODE_CONFIRM_TWEET)
