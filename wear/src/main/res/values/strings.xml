@@ -3,4 +3,7 @@
     <string name="hello">Tweet</string>
     <string name="button_text">Start</string>
     <string name="text_tweet_confirm">tweet body</string>
+    <string name="hello_round">Hello Round World!</string>
+    <string name="hello_square">Hello Square World!</string>
+    <string name="launch_phone_app">Phone App</string>
 </resources>

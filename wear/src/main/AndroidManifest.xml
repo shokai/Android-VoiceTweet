@@ -11,15 +11,17 @@
         android:theme="@android:style/Theme.DeviceDefault" >
         <activity
             android:name=".TweetActivity_"
-            android:launchMode="singleTask"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".TweetConfirmActivity_" />
         <activity android:name="android.support.wearable.activity.ConfirmationActivity" />
+        <activity android:name=".LaunchPhoneAppActivity_" />
     </application>
 
 </manifest>
