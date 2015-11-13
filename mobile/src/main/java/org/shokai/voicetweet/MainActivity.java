@@ -146,6 +146,7 @@ public class MainActivity extends GoogleApiClientActivity {
     @OptionsItem(R.id.action_launch_wear)
     void launchWearApp(){
         Log.i(TAG, "launch wear app");
+        sendMessageAsync(MessagePath.LAUNCH_APP, "launch wear app");
     }
 
 }
