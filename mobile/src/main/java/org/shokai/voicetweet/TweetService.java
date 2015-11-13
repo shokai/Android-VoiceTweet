@@ -1,5 +1,6 @@
 package org.shokai.voicetweet;
 
+import android.content.Intent;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -41,16 +42,24 @@ public class TweetService extends WearableListenerService implements
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.v(TAG, "onMessageReceived");
-        if (messageEvent.getPath().equals(MessagePath.TWEET)) {
-            String msg;
-            try {
-                msg = new String(messageEvent.getData(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                return;
-            }
-            Log.i(TAG, "receive from wear: "+ msg);
-            updateTweet(msg);
+        switch (messageEvent.getPath()) {
+            case MessagePath.TWEET:
+                String msg;
+                try {
+                    msg = new String(messageEvent.getData(), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    return;
+                }
+                Log.i(TAG, "receive from wear: " + msg);
+                updateTweet(msg);
+                break;
+            case MessagePath.LAUNCH_APP:
+                Log.i(TAG, "launch phone app");
+                Intent intent = new Intent(this, MainActivity_.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                this.startActivity(intent);
+                sendMessageToWear(MessagePath.LAUNCH_APP_SUCCESS, "Launch App Success", this);
         }
     }
 

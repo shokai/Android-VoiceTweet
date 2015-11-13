@@ -47,6 +47,7 @@ public class TweetActivity extends GoogleApiClientActivity implements
     @Override
     protected void onResume(){
         super.onResume();
+        final TweetActivity self = this;
         Wearable.DataApi.getDataItems(mGoogleApiClient)
                 .setResultCallback(new ResultCallback<DataItemBuffer>() {
                     @Override
@@ -56,6 +57,9 @@ public class TweetActivity extends GoogleApiClientActivity implements
                                 DataMap dataMap = DataMap.fromByteArray(dataItem.getData());
                                 boolean login = dataMap.getBoolean(MessagePath.IS_LOGIN);
                                 Log.v(TAG, "twitter login :" + login);
+                                if(!login){
+                                    LaunchPhoneAppActivity_.intent(self).start();
+                                }
                             }
                         }
                         dataItems.release();
