@@ -54,9 +54,13 @@ public class GoogleApiClientService extends WearableListenerService implements
         else {
             Log.i(TAG, "sendMessage success");
         }
+    }
+
+    @Override
+    public void onDestroy() {
         if(mGoogleApiClient != null && mGoogleApiClient.isConnected()){
             mGoogleApiClient.disconnect();
         }
+        super.onDestroy();
     }
-
 }
