@@ -3,7 +3,6 @@ package org.shokai.voicetweet;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.support.wearable.activity.ConfirmationActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -12,8 +11,6 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 
 import org.androidannotations.annotations.Click;
@@ -23,8 +20,7 @@ import org.androidannotations.annotations.OnActivityResult;
 import java.util.List;
 
 @EActivity(R.layout.activity_tweet)
-public class TweetActivity extends GoogleApiClientActivity implements
-        MessageApi.MessageListener {
+public class TweetActivity extends GoogleApiClientActivity {
 
     public final static String TAG = "TweetActivity";
 
@@ -89,7 +85,6 @@ public class TweetActivity extends GoogleApiClientActivity implements
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(TAG, "GoogleApiClient Connected");
-        Wearable.MessageApi.addListener(mGoogleApiClient, this);
     }
 
     @Override
@@ -108,26 +103,4 @@ public class TweetActivity extends GoogleApiClientActivity implements
         finish();
     }
 
-    /*
-     * Message from Handheld
-     */
-    @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
-        String res = new String(messageEvent.getData());
-        Intent intent = new Intent(this, ConfirmationActivity.class);
-
-        switch (messageEvent.getPath()) {
-            case MessagePath.TWEET_SUCCESS:
-                Log.i(TAG, "Tweet Success: " + res);
-                intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, res);
-                intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.SUCCESS_ANIMATION);
-                break;
-            case MessagePath.TWEET_FAILED:
-                Log.i(TAG, "Tweet Failed: " + res);
-                intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, res);
-                intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.FAILURE_ANIMATION);
-                break;
-        }
-        startActivity(intent);
-    }
 }
