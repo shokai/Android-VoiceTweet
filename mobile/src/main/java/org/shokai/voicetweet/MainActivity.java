@@ -10,9 +10,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.wearable.PutDataMapRequest;
-import com.google.android.gms.wearable.Wearable;
-
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
@@ -77,9 +74,6 @@ public class MainActivity extends GoogleApiClientActivity {
             mTextViewScreenName.setText(getResources().getText(R.string.text_screen_name));
             mImageViewProfile.setVisibility(View.INVISIBLE);
         }
-        PutDataMapRequest mapReq = PutDataMapRequest.create(MessagePath.ROOT);
-        mapReq.getDataMap().putBoolean(MessagePath.IS_LOGIN, login);
-        Wearable.DataApi.putDataItem(mGoogleApiClient, mapReq.asPutDataRequest());
     }
 
     @Override
