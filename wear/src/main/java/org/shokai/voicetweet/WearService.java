@@ -22,6 +22,12 @@ public class WearService extends GoogleApiClientService {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 this.startActivity(intent);
                 break;
+            case MessagePath.TWITTER_NOT_LOGIN:
+                Log.i(TAG, msg);
+                intent = new Intent(this, LaunchPhoneAppActivity_.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                this.startActivity(intent);
+                break;
             case MessagePath.TWEET_SUCCESS:
                 Log.i(TAG, "Tweet Success: " + msg);
                 intent = new Intent(this, ConfirmationActivity.class);
