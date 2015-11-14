@@ -47,7 +47,7 @@ public class TweetService extends GoogleApiClientService {
 
     private Status updateTweet(String tweet){
         if(!mTwitterUtil.hasToken()){
-            sendMessage(MessagePath.TWEET_FAILED, "Please Login", this);
+            sendMessage(MessagePath.TWITTER_NOT_LOGIN, "Please Login", this);
             return null;
         }
         Twitter client = mTwitterUtil.getTwitterInstance();
