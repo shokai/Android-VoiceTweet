@@ -1,5 +1,10 @@
+machine:
+  java:
+    version: oraclejdk8
+  environment:
+    JAVA_OPTS: "-Xms518m -Xmx2048m"
 test:
   pre:
     - cd mobile/src/main/java/org/shokai/voicetweet/ && cp TwitterConfig.java.sample TwitterConfig.java
   override:
-    - ./gradlew assembleDebug
+    - make test
