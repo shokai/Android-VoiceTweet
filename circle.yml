@@ -3,6 +3,9 @@ machine:
     version: oraclejdk8
   environment:
     JAVA_OPTS: "-Xms518m -Xmx2048m"
+dependencies:
+  pre:
+    - echo y | android update sdk --no-ui --all --filter "extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository"
 test:
   pre:
     - cd mobile/src/main/java/org/shokai/voicetweet/ && cp TwitterConfig.java.sample TwitterConfig.java
