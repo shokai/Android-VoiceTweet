@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 
 import twitter4j.Twitter;
@@ -32,16 +33,13 @@ public class TwitterOAuthActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         mTwitterUtil = new TwitterUtil(this);
-        if(mTwitterUtil.hasToken()){
-            mTwitterUtil.logout();
-            Toast.makeText(this, "Logout", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
         mTwitter = mTwitterUtil.getTwitterInstance();
         Resources resources = getResources();
         mCallbackUrl = resources.getString(R.string.auth_scheme)+"://"+resources.getString(R.string.auth_host);
+    }
+
+    @Click(R.id.buttonLogin)
+    void login(){
         authStart();
     }
 

@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">VoiceTweet</string>
-    <string name="action_login">Login</string>
+    <string name="action_logout">Logout</string>
     <string name="auth_scheme">voicetweet</string>
     <string name="auth_host">twitter</string>
     <string name="title_activity_tweet_test">TweetTestActivity</string>
-    <string name="text_screen_name">Please Login</string>
+    <string name="text_screen_name">screen_name</string>
+    <string name="button_login">Login Twitter</string>
 </resources>

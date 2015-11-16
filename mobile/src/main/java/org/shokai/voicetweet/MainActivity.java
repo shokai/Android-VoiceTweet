@@ -6,9 +6,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
@@ -49,8 +49,8 @@ public class MainActivity extends GoogleApiClientActivity {
     @OptionsMenuItem(R.id.action_tweet_test)
     MenuItem mItemTweetTest;
 
-    @OptionsMenuItem(R.id.action_login)
-    MenuItem mItemLogin;
+    @OptionsMenuItem(R.id.action_logout)
+    MenuItem mItemLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,30 +62,27 @@ public class MainActivity extends GoogleApiClientActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        boolean login = false;
-        if(mTwitterUtil.hasToken()){
-            mTextViewScreenName.setText("Loading..");
-            mTwitter = mTwitterUtil.getTwitterInstance();
-            getTwitterScreenNameAsync();
-            getTwitterProfileImageAsync();
-            login = true;
+        if (!mTwitterUtil.hasToken()) {
+            TwitterOAuthActivity_.intent(this).start();
+            return;
         }
-        else{
-            mTextViewScreenName.setText(getResources().getText(R.string.text_screen_name));
-            mImageViewProfile.setVisibility(View.INVISIBLE);
-        }
+        mTextViewScreenName.setText("Loading..");
+        mTwitter = mTwitterUtil.getTwitterInstance();
+        getTwitterScreenNameAsync();
+        getTwitterProfileImageAsync();
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         mItemTweetTest.setVisible(BuildConfig.DEBUG && mTwitterUtil.hasToken());
         mItemLaunchWear.setVisible(mTwitterUtil.hasToken());
-        mItemLogin.setTitle(mTwitterUtil.hasToken() ? "Logout" : "Login");
         return super.onPrepareOptionsMenu(menu);
     }
 
-    @OptionsItem(R.id.action_login)
-    void login(){
+    @OptionsItem(R.id.action_logout)
+    void logout() {
+        mTwitterUtil.logout();
+        Toast.makeText(this, "Logout", Toast.LENGTH_SHORT).show();
         TwitterOAuthActivity_.intent(this).startForResult(CODE_TWITTER_LOGIN);
     }
 
@@ -134,7 +131,6 @@ public class MainActivity extends GoogleApiClientActivity {
     @UiThread
     void displayTwitterProfileImage(Bitmap image){
         mImageViewProfile.setImageBitmap(image);
-        mImageViewProfile.setVisibility(View.VISIBLE);
     }
 
     @OptionsItem(R.id.action_launch_wear)
